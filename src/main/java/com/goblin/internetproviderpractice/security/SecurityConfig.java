@@ -7,15 +7,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Config for the default security which set ups the password encoder and request permits
+ */
 @Configuration
 @ConditionalOnProperty(value = "security.enabled", havingValue = "true")
 public class SecurityConfig {
@@ -25,13 +26,23 @@ public class SecurityConfig {
     @Autowired
     private UnauthorizedEntryPoint unauthorizedEntryPoint;
 
+    /**
+     * @return Password encoder used by the user profile system
+     */
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Setup the security filter chain with all necessary security features
+     * @param http Security config builder object
+     * @return
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // disable csrf because this is a simple practice project
         http.csrf(AbstractHttpConfigurer::disable);
         http.securityContext(withDefaults()) // infrastructure
                 .servletApi(withDefaults()) // infrastructure
@@ -45,6 +56,7 @@ public class SecurityConfig {
                 .anonymous(withDefaults()) // authentication
                 .exceptionHandling(withDefaults()) // infrastructuresecurityMatcher("/services*", "/user*")
                 .authorizeHttpRequests(unauthorizedEntryPoint ->
+                        // setup all the permits for requests
                         unauthorizedEntryPoint
                                 .requestMatchers("/services*").hasAnyRole("ADMIN", "USER")
                                 .requestMatchers("/classes*").hasAnyRole("ADMIN", "USER")
@@ -56,8 +68,5 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web -> web.ignoring().requestMatchers(new AntPathRequestMatcher("/h2-console/**")));
-    }
+
 }

@@ -15,13 +15,25 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Service for converting the given user details into details from the service database
+ */
 @Service
 public class UserInfoService implements UserDetailsService {
+    /**
+     * Reference to the users table where actual user info is stored
+     */
     @Autowired
     private RegisterNewUserRepository userRepository;
 
     private final Set<GrantedAuthority> authoritySet = new HashSet<>();
 
+    /**
+     * Retrieve full user data from a name
+     * @param username Source username
+     * @return User details for a given user
+     * @throws UsernameNotFoundException If no user uses this name
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserProfile> user = userRepository.findByName(username);

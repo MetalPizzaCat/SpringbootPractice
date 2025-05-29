@@ -19,6 +19,12 @@ public class RegistrationService {
     @Autowired
     private PasswordEncoder encoder;
 
+    /**
+     * Create a new user
+     * @param profile Base data required to create a new user
+     * @param role What role does the user have
+     * @return True if successfully created a user, false if user already exists
+     */
     @Transactional
     public boolean registerUser(UserRegisterRequest profile, Role role) {
         Optional<UserProfile> user = userRepository.findByName(profile.name());
@@ -33,6 +39,11 @@ public class RegistrationService {
         return false;
     }
 
+    /**
+     * Delete a user with a given name if present
+     * @param name Name of the user to delete
+     * @return True if user existed and was deleted
+     */
     @Transactional
     public boolean deleteUser(String name) {
         Optional<UserProfile> userProfile = userRepository.findByName(name);

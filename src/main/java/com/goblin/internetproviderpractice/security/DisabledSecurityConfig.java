@@ -11,8 +11,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+/**
+ * Security config that will run whenever the application has security disabled. It will disable all the security checks and permit all requests
+ */
 @Configuration
 @ConditionalOnProperty(value = "security.enabled", havingValue = "false")
 public class DisabledSecurityConfig {
@@ -34,8 +36,4 @@ public class DisabledSecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web -> web.ignoring().requestMatchers(new AntPathRequestMatcher("/h2-console/**")));
-    }
 }
