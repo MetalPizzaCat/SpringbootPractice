@@ -32,4 +32,6 @@ public class ServiceClass {
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ServiceInfo> services;
+
+
 }

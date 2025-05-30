@@ -1,5 +1,6 @@
 package com.goblin.internetproviderpractice.services;
 
+import com.goblin.internetproviderpractice.dto.ShortServiceInfoDto;
 import com.goblin.internetproviderpractice.model.requests.ServiceCreateRequest;
 import com.goblin.internetproviderpractice.model.ServiceInfo;
 import com.goblin.internetproviderpractice.repositories.ServiceRepository;
@@ -26,20 +27,24 @@ public class ServiceManagementService {
     @Autowired
     private ClassService classService;
 
+    @Autowired
+    private UserInfoService userInfoService;
+
     /**
      * Create a new service with given name and author
      *
      * @param serviceCreateRequest Data used for the creation of the service
      * @param creator              Name of the user who requested the creation of the service
      * @return Newly created service
+     * @throws NoSuchElementException If parameters id is invalid an exception will be thrown
      */
     @Transactional
     public ServiceInfo createService(@NonNull ServiceCreateRequest serviceCreateRequest,
-                                     @NonNull String creator) {
+                                     @NonNull String creator) throws NoSuchElementException {
         return serviceRepository.save(ServiceInfo.builder()
                 .title(serviceCreateRequest.title())
                 .createdAt(LocalDateTime.now())
-                .createdBy(creator).build());
+                .createdBy(userInfoService.findByName(creator).orElseThrow()).build());
     }
 
     /**
@@ -58,9 +63,18 @@ public class ServiceManagementService {
         return serviceRepository.save(ServiceInfo.builder()
                 .title(serviceCreateRequest.title())
                 .createdAt(LocalDateTime.now())
-                .createdBy(creator)
+                .createdBy(userInfoService.findByName(creator).orElseThrow())
                 .parameters(parameterIds.stream().map(i -> parameterService.findById(i).orElseThrow()).collect(Collectors.toSet()))
                 .build());
+    }
+
+    @Transactional
+    public void deleteById(int id){
+        serviceRepository.deleteById(id);
+    }
+    @Transactional(readOnly = true)
+    public Iterable<ShortServiceInfoDto> findServicesToDo(){
+        return serviceRepository.findAllShortServiceInfoDto();
     }
 
     @Transactional(readOnly = true)
@@ -105,13 +119,14 @@ public class ServiceManagementService {
 
     /**
      * Approve a service to be a part of a given class
+     *
      * @param serviceId Id of the service to approve
-     * @param classId Id of the class to assign to the service
+     * @param classId   Id of the class to assign to the service
      * @return Updated service value
      * @throws NoSuchElementException If either service or class id are invalid
      */
     @Transactional
-    public ServiceInfo approveService(Integer serviceId, Integer classId) throws  NoSuchElementException{
+    public ServiceInfo approveService(Integer serviceId, Integer classId) throws NoSuchElementException {
         ServiceInfo service = serviceRepository.findById(serviceId).orElseThrow();
         service.setServiceClass(classService.findById(classId).orElseThrow());
         service.setApprovedAt(LocalDateTime.now());

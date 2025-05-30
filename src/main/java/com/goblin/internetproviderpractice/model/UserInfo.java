@@ -1,7 +1,10 @@
 package com.goblin.internetproviderpractice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Builder
@@ -10,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "`user_profile`")
-public class UserProfile {
+public class UserInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -18,10 +21,8 @@ public class UserProfile {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String password;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ServiceInfo> services;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 }

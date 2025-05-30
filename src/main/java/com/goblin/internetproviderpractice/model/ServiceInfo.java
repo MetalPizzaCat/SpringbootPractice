@@ -28,10 +28,8 @@ public class ServiceInfo {
     @Column(name = "approved_at", nullable = true)
     private LocalDateTime approvedAt;
 
-    @Column(name = "created_by", nullable = false)
-    private String createdBy;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "service_parameters",
             joinColumns = @JoinColumn(name = "service_id"),
             inverseJoinColumns = @JoinColumn(name = "parameter_id"))
@@ -39,5 +37,8 @@ public class ServiceInfo {
 
     @ManyToOne
     private ServiceClass serviceClass;
+
+    @ManyToOne
+    private UserInfo createdBy;
 
 }

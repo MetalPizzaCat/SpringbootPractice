@@ -1,5 +1,6 @@
 package com.goblin.internetproviderpractice.controllers;
 
+import com.goblin.internetproviderpractice.dto.ShortServiceInfoDto;
 import com.goblin.internetproviderpractice.model.ServiceInfo;
 import com.goblin.internetproviderpractice.model.requests.ApproveRequest;
 import com.goblin.internetproviderpractice.model.requests.ServiceCreateRequest;
@@ -62,6 +63,10 @@ public class ServiceController {
     public ResponseEntity<Iterable<ServiceInfo>> findUnapproved() {
         return ResponseEntity.ok(managementService.findAllUnapproved());
     }
+    @GetMapping("/todo")
+    public ResponseEntity<Iterable<ShortServiceInfoDto>> findServicesToDo(){
+        return ResponseEntity.ok(managementService.findServicesToDo());
+    }
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<ServiceInfo> approveService(@PathVariable Integer id,
@@ -71,4 +76,14 @@ public class ServiceController {
         URI location = ucb.path("/services/{id}").buildAndExpand(result.getId()).toUri();
         return ResponseEntity.created(location).body(result);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteService(@PathVariable Integer id) {
+        if (managementService.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        managementService.deleteById(id);
+        return ResponseEntity.ok("Deleted service");
+    }
+
 }

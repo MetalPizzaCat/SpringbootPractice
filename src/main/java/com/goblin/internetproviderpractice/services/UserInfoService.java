@@ -1,8 +1,11 @@
 package com.goblin.internetproviderpractice.services;
 
+import com.goblin.internetproviderpractice.model.UserInfo;
 import com.goblin.internetproviderpractice.model.UserProfile;
 import com.goblin.internetproviderpractice.repositories.RegisterNewUserRepository;
+import com.goblin.internetproviderpractice.repositories.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -10,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -25,6 +29,9 @@ public class UserInfoService implements UserDetailsService {
      */
     @Autowired
     private RegisterNewUserRepository userRepository;
+
+    @Autowired
+    private UserInfoRepository userInfoRepository;
 
     private final Set<GrantedAuthority> authoritySet = new HashSet<>();
 
@@ -43,5 +50,10 @@ public class UserInfoService implements UserDetailsService {
         GrantedAuthority authority = new SimpleGrantedAuthority(user.get().getRole().toString());
         authoritySet.add(authority);
         return new User(username, user.get().getPassword(), authoritySet);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserInfo> findByName(@NonNull String name){
+        return userInfoRepository.findByName(name);
     }
 }

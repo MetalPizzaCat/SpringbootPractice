@@ -2,7 +2,7 @@ package com.goblin.internetproviderpractice.controllers;
 
 import com.goblin.internetproviderpractice.model.Role;
 import com.goblin.internetproviderpractice.model.requests.UserRegisterRequest;
-import com.goblin.internetproviderpractice.model.UserRequest;
+import com.goblin.internetproviderpractice.model.requests.UserRequest;
 import com.goblin.internetproviderpractice.services.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
